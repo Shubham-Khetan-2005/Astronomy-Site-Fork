@@ -26,13 +26,13 @@ function Gallery({ images }) {
   };
 
   const nextImage = (e) => {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     const nextIndex = (selectedImageIndex + 1) % images.length;
     setSelectedImageIndex(nextIndex);
   };
 
   const prevImage = (e) => {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     const prevIndex = (selectedImageIndex - 1 + images.length) % images.length;
     setSelectedImageIndex(prevIndex);
   };
@@ -41,6 +41,21 @@ function Gallery({ images }) {
   const handleMouseMove = (e) => {
     setCursorPosition({ x: e.clientX, y: e.clientY });
   };
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      } else if (e.key === 'ArrowRight') {
+        nextImage();
+      } else if (e.key === 'ArrowLeft') {
+        prevImage();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isModalOpen, selectedImageIndex]);
 
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
